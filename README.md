@@ -3,6 +3,27 @@
 
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
+version 3
+
+30 jan 2026
+
+features:
+
+- multi user
+- player vs player
+- auto spawning demons, trools and bosses
+- health and hit points
+- magic potions
+
+to run:
+
+server:    python ssh_server_multiplayer_rpg.py
+
+clients:   ssh -p 2222 player@localhost (or ip of zorksshserver)
+
+
+
+
 ## 🎯 Key Architecture Concepts
 
 ### The Matrix Approach
