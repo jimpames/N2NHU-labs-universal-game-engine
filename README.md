@@ -13,7 +13,7 @@ VERSION 2
 
 - SSH multi player
 - health points
-- auto spawning demonds, bosses and trolls
+- auto spawning demons, bosses and trolls
 - random materializing health potions
 - physics for ice and water
 
