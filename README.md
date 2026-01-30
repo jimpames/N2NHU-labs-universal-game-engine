@@ -1,34 +1,6 @@
 # ZORK-like Text Adventure Game
 ## Matrix-Based Algebraic Design Demo
 
-GPL3
-
-by N2NHU Labs for Applied AI
-
-blame: j p ames
-
-VERSION 3
-
-30 Jan 2026 new features:
-
-- SSH multi player
-- player vs player
-- health points
-- auto spawning demons, bosses and trolls
-- random materializing health potions
-- physics for ice and water
-
-  HOWTO play:
-
-  make a config folder in your folder for the game and put all .ini in the config folder
-
-  Start SSH server:            python ssh_server_multiplayer_rpg.py
-
-  players can connect with:   ssh -p 2222 player@ip.of.ssh.server
-
-
-
-
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
 ## 🎯 Key Architecture Concepts

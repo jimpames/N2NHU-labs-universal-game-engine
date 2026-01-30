@@ -52,56 +52,12 @@ class MultiplayerGameServer:
         self.player_locations: Dict[str, str] = {}
         self.player_inventories: Dict[str, set] = {}
         self.player_health: Dict[str, int] = {}
-        self.player_pvp_mode: Dict[str, bool] = {}  # Track PvP enabled status
-        self.player_deaths: Dict[str, int] = {}  # Track death count
-        self.player_kills: Dict[str, int] = {}  # Track kills
-        
-        # Load combat rules
-        self.combat_rules = self.load_combat_rules()
         
         print("🌐 ZORK RPG Multiplayer Server initialized")
         print(f"📁 World loaded from {config_path}/")
         print(f"⚔️  {len(self.engine.sprite_templates)} sprite types available")
         print(f"🗺️  {len(self.engine.rooms)} rooms in world")
         print(f"📦 {len(self.engine.objects)} objects loaded")
-        print(f"⚔️  PvP combat system loaded!")
-    
-    def load_combat_rules(self) -> Dict:
-        """Load combat rules from combat.ini"""
-        import configparser
-        import os
-        
-        combat_file = f"{self.config_path}/combat.ini"
-        if not os.path.exists(combat_file):
-            print("⚠️  No combat.ini found - using defaults")
-            return {
-                'player_vs_player': {
-                    'base_damage': 10,
-                    'weapon_multiplier': 1.0,
-                    'can_attack': True,
-                    'requires_pvp_mode': True
-                }
-            }
-        
-        config = configparser.ConfigParser()
-        config.read(combat_file)
-        
-        rules = {}
-        for section in config.sections():
-            rules[section] = {}
-            for key, value in config[section].items():
-                # Parse values
-                try:
-                    if value.lower() in ['true', 'false']:
-                        rules[section][key] = value.lower() == 'true'
-                    elif '.' in value:
-                        rules[section][key] = float(value)
-                    else:
-                        rules[section][key] = int(value)
-                except:
-                    rules[section][key] = value
-        
-        return rules
     
     def add_player(self, player_name: str, session: PlayerSession):
         """Register new player"""
@@ -109,9 +65,6 @@ class MultiplayerGameServer:
         self.player_locations[player_name] = "entrance_hall"
         self.player_inventories[player_name] = set()
         self.player_health[player_name] = 100
-        self.player_pvp_mode[player_name] = False  # PvP disabled by default
-        self.player_deaths[player_name] = 0
-        self.player_kills[player_name] = 0
         
         print(f"✅ Player joined: {player_name} ({len(self.players)} total)")
     
@@ -126,12 +79,6 @@ class MultiplayerGameServer:
                 del self.player_inventories[player_name]
             if player_name in self.player_health:
                 del self.player_health[player_name]
-            if player_name in self.player_pvp_mode:
-                del self.player_pvp_mode[player_name]
-            if player_name in self.player_deaths:
-                del self.player_deaths[player_name]
-            if player_name in self.player_kills:
-                del self.player_kills[player_name]
             
             print(f"❌ Player left: {player_name} ({len(self.players)} remaining)")
             
@@ -182,7 +129,6 @@ class MultiplayerGameServer:
             for other_name in other_players:
                 health = self.player_health.get(other_name, 100)
                 inventory = self.player_inventories.get(other_name, set())
-                pvp_enabled = self.player_pvp_mode.get(other_name, False)
                 
                 # Show what they're holding
                 items_held = []
@@ -194,11 +140,8 @@ class MultiplayerGameServer:
                 if items_held:
                     holding_text = f" (holding: {', '.join(items_held)})"
                 
-                # PvP indicator
-                pvp_indicator = " ⚔️ [PvP]" if pvp_enabled else " 🕊️ [Safe]"
-                
                 health_bar = f"[{'█' * (health // 10)}{'░' * ((100 - health) // 10)}]"
-                output.append(f"  👤 {other_name} {health_bar} {health}/100 HP{holding_text}{pvp_indicator}")
+                output.append(f"  👤 {other_name} {health_bar} {health}/100 HP{holding_text}")
         
         # List sprites in room
         sprites_here = [s for s in self.engine.sprites.values() 
@@ -255,66 +198,6 @@ class MultiplayerGameServer:
             )
             return response
         
-        if cmd_lower == 'pvp':
-            # Toggle PvP mode
-            current_mode = self.player_pvp_mode.get(player_name, False)
-            self.player_pvp_mode[player_name] = not current_mode
-            new_mode = self.player_pvp_mode[player_name]
-            
-            if new_mode:
-                await self.broadcast_to_room(
-                    location,
-                    f"⚔️  {player_name} has enabled PvP mode!",
-                    exclude=player_name
-                )
-                return "⚔️  PvP mode ENABLED! You can now attack and be attacked by other players!"
-            else:
-                await self.broadcast_to_room(
-                    location,
-                    f"🕊️  {player_name} has disabled PvP mode.",
-                    exclude=player_name
-                )
-                return "🕊️  PvP mode DISABLED. You are safe from player attacks."
-        
-        if cmd_lower.startswith('attack ') or cmd_lower.startswith('kill '):
-            # Check if attacking a player
-            parts = command.split()
-            if len(parts) < 2:
-                return "Attack who? (Usage: attack <target> or attack <target> with <weapon>)"
-            
-            target_name = parts[1]
-            weapon_name = None
-            
-            # Check for "with weapon"
-            if 'with' in parts:
-                with_idx = parts.index('with')
-                weapon_name = ' '.join(parts[with_idx+1:])
-            
-            # Is target a player? (case-insensitive match)
-            target_player = None
-            for pname in self.players.keys():
-                if pname.lower() == target_name.lower() and pname != player_name:
-                    target_player = pname
-                    break
-            
-            if target_player:
-                return await self.handle_pvp_attack(player_name, target_player, weapon_name)
-        
-        if cmd_lower.startswith('stats'):
-            # Show PvP stats
-            kills = self.player_kills.get(player_name, 0)
-            deaths = self.player_deaths.get(player_name, 0)
-            pvp_mode = self.player_pvp_mode.get(player_name, False)
-            kd_ratio = kills / deaths if deaths > 0 else kills
-            
-            return f"""
-📊 Combat Stats for {player_name}:
-⚔️  Kills: {kills}
-💀 Deaths: {deaths}
-📈 K/D Ratio: {kd_ratio:.2f}
-{"⚔️  PvP: ENABLED" if pvp_mode else "🕊️  PvP: DISABLED"}
-"""
-        
         if cmd_lower == 'who':
             player_list = [f"  👤 {name} (in {self.player_locations[name]})" 
                           for name in self.players.keys()]
@@ -350,12 +233,8 @@ class MultiplayerGameServer:
             # Show the new room with players
             return self.format_look_for_player(player_name, new_location)
         
-        # Execute normal command (sprites, objects, etc.)
-        try:
-            result = self.engine.execute_command(command)
-        except Exception as e:
-            # If engine command fails, return helpful error
-            return f"⚠️  Command error: {str(e)}"
+        # Execute normal command
+        result = self.engine.execute_command(command)
         
         # Update player state
         self.player_locations[player_name] = self.engine.player_location
@@ -381,141 +260,6 @@ class MultiplayerGameServer:
                 )
         
         return result
-    
-    async def handle_pvp_attack(self, attacker_name: str, target_name: str, weapon_name: Optional[str] = None) -> str:
-        """Handle player vs player combat"""
-        # Get combat rules
-        pvp_rules = self.combat_rules.get('player_vs_player', {})
-        
-        # Check if PvP is allowed
-        if not pvp_rules.get('can_attack', True):
-            return "PvP combat is disabled on this server."
-        
-        # Check if requires PvP mode
-        if pvp_rules.get('requires_pvp_mode', True):
-            attacker_pvp = self.player_pvp_mode.get(attacker_name, False)
-            target_pvp = self.player_pvp_mode.get(target_name, False)
-            
-            if not attacker_pvp:
-                return "⚠️  You must enable PvP mode first! Type 'pvp' to enable."
-            
-            if not target_pvp:
-                return f"⚠️  {target_name} has PvP disabled. They are protected."
-        
-        # Check same room
-        attacker_loc = self.player_locations.get(attacker_name)
-        target_loc = self.player_locations.get(target_name)
-        
-        if attacker_loc != target_loc:
-            return f"{target_name} is not here."
-        
-        # Get attacker's weapon
-        attacker_inv = self.player_inventories.get(attacker_name, set())
-        weapon = None
-        weapon_damage = 0
-        
-        if weapon_name:
-            # Find specific weapon
-            for item_id in attacker_inv:
-                if item_id in self.engine.objects:
-                    obj = self.engine.objects[item_id]
-                    if weapon_name.lower() in obj.name.lower() and obj.is_weapon():
-                        weapon = obj
-                        weapon_damage = obj.get_damage()
-                        break
-            
-            if not weapon:
-                return f"You don't have a {weapon_name}."
-        else:
-            # Find any weapon
-            for item_id in attacker_inv:
-                if item_id in self.engine.objects:
-                    obj = self.engine.objects[item_id]
-                    if obj.is_weapon():
-                        weapon = obj
-                        weapon_damage = obj.get_damage()
-                        break
-        
-        # Calculate damage
-        base_damage = pvp_rules.get('base_damage', 10)
-        weapon_mult = pvp_rules.get('weapon_multiplier', 1.0)
-        total_damage = int(base_damage + (weapon_damage * weapon_mult))
-        
-        # Apply damage
-        target_health = self.player_health.get(target_name, 100)
-        target_health -= total_damage
-        self.player_health[target_name] = max(0, target_health)
-        
-        # Weapon name for message
-        weapon_text = f" with {weapon.name}" if weapon else " with your fists"
-        
-        # Build response
-        if target_health <= 0:
-            # Target killed!
-            self.player_kills[attacker_name] = self.player_kills.get(attacker_name, 0) + 1
-            self.player_deaths[target_name] = self.player_deaths.get(target_name, 0) + 1
-            
-            # Drop target's items
-            target_inv = self.player_inventories.get(target_name, set())
-            dropped_items = []
-            for item_id in list(target_inv):
-                if item_id in self.engine.objects:
-                    self.engine.objects[item_id].location = target_loc
-                    dropped_items.append(self.engine.objects[item_id].name)
-                    target_inv.remove(item_id)
-            
-            # Respawn target
-            respawn_loc = pvp_rules.get('respawn_location', 'entrance_hall')
-            self.player_locations[target_name] = respawn_loc
-            self.player_health[target_name] = 100
-            self.player_inventories[target_name] = set()
-            
-            # Broadcast death
-            await self.broadcast_to_room(
-                target_loc,
-                f"💀 {attacker_name} has slain {target_name}{weapon_text}!",
-                exclude=attacker_name
-            )
-            
-            if dropped_items:
-                await self.broadcast_to_room(
-                    target_loc,
-                    f"💰 {target_name} dropped: {', '.join(dropped_items)}"
-                )
-            
-            # Notify target
-            if target_name in self.players:
-                await self.players[target_name].send(
-                    f"\n💀 You have been slain by {attacker_name}!\n" +
-                    f"You respawn at {respawn_loc} with full health.\n" +
-                    f"Your items were dropped at {target_loc}.\n"
-                )
-            
-            loot_msg = ""
-            if dropped_items:
-                loot_msg = f"\n💰 {target_name} dropped: {', '.join(dropped_items)}"
-            
-            return f"⚔️  You attack {target_name}{weapon_text} for {total_damage} damage!\n💀 {target_name} has been slain!{loot_msg}"
-        
-        else:
-            # Target still alive
-            health_bar = f"[{'█' * (target_health // 10)}{'░' * ((100 - target_health) // 10)}]"
-            
-            # Broadcast hit
-            await self.broadcast_to_room(
-                target_loc,
-                f"⚔️  {attacker_name} attacks {target_name}{weapon_text} for {total_damage} damage! {health_bar}",
-                exclude=attacker_name
-            )
-            
-            # Notify target
-            if target_name in self.players:
-                await self.players[target_name].send(
-                    f"⚠️  {attacker_name} attacks you{weapon_text} for {total_damage} damage! " +
-                    f"Health: {target_health}/100 {health_bar}"
-                )
-            
-            return f"⚔️  You attack {target_name}{weapon_text} for {total_damage} damage!\n{target_name}: {health_bar} {target_health}/100 HP"
     
     async def process_global_turn(self):
         """Process game turn effects (spawns, transformations, sprite AI)"""
@@ -620,20 +364,12 @@ Social: say [message], who (list players)
 Items: drink [potion], use [object]
 Meta: help, quit
 
-PvP COMBAT:
-===========
-pvp                     - Toggle PvP mode on/off
-attack [player]         - Attack another player (requires PvP)
-attack [player] with [weapon] - Attack with specific weapon
-stats                   - View your combat statistics
-
 MULTIPLAYER:
 ============
 - See other players in your room
 - They see what you pick up/drop
 - Use 'say' to communicate
 - Real-time shared world!
-- Enable PvP to battle other players!
 """
                 process.stdout.write(help_text)
                 await process.stdout.drain()
@@ -642,24 +378,16 @@ MULTIPLAYER:
             if not command:
                 continue
             
-            # Execute command with error handling
-            try:
-                result = await game_server.handle_player_command(player_name, command)
-                
-                if result:
-                    process.stdout.write(result + "\n")
-                    await process.stdout.drain()
-                
-                # Process global turn effects occasionally
-                if game_server.engine.turn_count % 3 == 0:
-                    await game_server.process_global_turn()
+            # Execute command
+            result = await game_server.handle_player_command(player_name, command)
             
-            except Exception as e:
-                # Don't disconnect on command error - just show error
-                error_msg = f"⚠️  Error executing command: {str(e)}\n"
-                process.stdout.write(error_msg)
+            if result:
+                process.stdout.write(result + "\n")
                 await process.stdout.drain()
-                print(f"Command error for {player_name}: {e}")
+            
+            # Process global turn effects occasionally
+            if game_server.engine.turn_count % 3 == 0:
+                await game_server.process_global_turn()
         
     except Exception as e:
         print(f"Error handling client {player_name}: {e}")
