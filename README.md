@@ -12,7 +12,7 @@ features:
 - multi user
 - SSH multi player
 - player vs player
-- auto spawning demons, trools and bosses
+- auto spawning demons, trolls and bosses
 - health and hit points
 - magic potions
 - physics for ice and water
