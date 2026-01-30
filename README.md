@@ -7,11 +7,12 @@ by N2NHU Labs for Applied AI
 
 blame: j p ames
 
-VERSION 2
+VERSION 3
 
 30 Jan 2026 new features:
 
 - SSH multi player
+- player vs player
 - health points
 - auto spawning demons, bosses and trolls
 - random materializing health potions
