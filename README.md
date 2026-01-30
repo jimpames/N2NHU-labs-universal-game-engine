@@ -19,7 +19,7 @@ VERSION 2
 
   HOWTO play:
 
-  make a config folder inn your folder for the game and put all .ini in the config folder
+  make a config folder in your folder for the game and put all .ini in the config folder
 
   Start SSH server:            python ssh_server_multiplayer_rpg.py
 
