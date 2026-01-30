@@ -5,6 +5,10 @@ This is a demonstration of how **algebraic design with matrices** can create com
 
 version 3
 
+GPL3
+
+a product of the n2nhu lab for applied ai
+
 30 jan 2026
 
 features:
