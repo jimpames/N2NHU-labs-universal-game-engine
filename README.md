@@ -17,6 +17,10 @@ features:
 
 to run:
 
+make a config dir
+put all the .ini in folder config
+
+
 server:    python ssh_server_multiplayer_rpg.py
 
 clients:   ssh -p 2222 player@localhost (or ip of zorksshserver)
