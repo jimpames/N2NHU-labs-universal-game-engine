@@ -57,12 +57,18 @@ put all the .ini in folder config
 
 
 
-start server:                python ssh_server_multiplayer_rpg.py - be sure to make a new venv and run this cmd in there first time: pip install -r requirements.txt
+start talking server:                python ssh_server_multiplayer_rpg.py - be sure to make a new venv and run this cmd in there first time: pip install -r requirements.txt
 
-start SSH clients:               ssh -p 2222 player@localhost (or ip of zorksshserver)
+start SSH clients - no sound:               ssh -p 2222 player@localhost (or ip of zorksshserver)
 
+---------------------------------------------------------------
 start speech enabled client: python ssh_voice_simple.py  - be sure to make a new venv and run this cmd in there first time: pip install -r voice-client-requirements.txt
 
+---------------------------------------------------------------------
+
+start CHAT enabled server:   python speech_ssh_server.py
+
+start CHAT enabled client:    python chat_ssh_client.py
 
 
 ## 🎯 Key Architecture Concepts
