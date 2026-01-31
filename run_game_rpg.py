@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-ZORK RPG - Enhanced with combat, health, and sprites!
+ZORK RPG - Enhanced with combat, health, sprites, and VOICE!
 """
 
 import sys
 from game_engine_rpg import GameEngineRPG
+from voice_synth import VoiceSynthesizer
 
 
 def main():
@@ -12,8 +13,18 @@ def main():
 ╔════════════════════════════════════════════════╗
 ║         ZORK RPG - MATRIX ADVENTURE           ║
 ║    Combat • Health • Sprites • Survival       ║
+║              🔊 VOICE ENABLED!                ║
 ╚════════════════════════════════════════════════╝
     """)
+    
+    # Initialize voice
+    voice = VoiceSynthesizer(enabled=True)
+    voice_enabled = True
+    
+    print("🔊 Voice synthesis is ENABLED!")
+    print("Type 'voice' to toggle voice on/off\n")
+    
+    voice.speak("Welcome to ZORK RPG!")
     
     player_name = input("Enter your name (default: Hero): ").strip() or "Hero"
     
@@ -25,8 +36,15 @@ def main():
     print("Type 'help' for commands, 'health' to check status, 'quit' to exit.\n")
     
     # Start game
-    print(engine.start_game())
-    print(f"\n{engine.check_health()}")
+    initial_text = engine.start_game()
+    print(initial_text)
+    if voice_enabled:
+        voice.speak(initial_text)
+    
+    health_status = engine.check_health()
+    print(f"\n{health_status}")
+    if voice_enabled:
+        voice.speak(health_status)
     
     # Main game loop
     while True:
@@ -62,7 +80,21 @@ def main():
         # Handle meta commands
         if command.lower() in ['quit', 'exit', 'q']:
             print("\nThanks for playing!")
+            if voice_enabled:
+                voice.speak("Thanks for playing!")
             break
+        
+        if command.lower() == 'voice':
+            voice_enabled = not voice_enabled
+            voice.enabled = voice_enabled
+            if voice_enabled:
+                msg = "🔊 Voice synthesis ENABLED!"
+                print(msg)
+                voice.speak(msg)
+            else:
+                msg = "🔇 Voice synthesis DISABLED."
+                print(msg)
+            continue
         
         if command.lower() in ['help', '?']:
             print("""
@@ -74,7 +106,7 @@ Actions: look/l, examine [object], take [object], drop [object]
 Combat: attack [enemy], attack [enemy] with [weapon], flee/run
 Items: drink [potion], use [object]
 Containers: open [container], close [container], put [object] in [container]
-System: save [name], load [name], quit
+System: save [name], load [name], voice (toggle voice), quit
 
 SURVIVAL TIPS:
 ==============
@@ -110,14 +142,41 @@ SURVIVAL TIPS:
         result = engine.execute_command(command)
         print(result)
         
+        # Speak result if voice enabled
+        if voice_enabled and result.strip():
+            voice_type = get_voice_type(result)
+            voice.speak(result, voice_type)
+        
         # Process turn
         messages = engine.process_turn()
         for msg in messages:
             print(msg)
+            if voice_enabled and msg.strip():
+                voice_type = get_voice_type(msg)
+                voice.speak(msg, voice_type)
         
         # Show health periodically
         if engine.turn_count % 5 == 0 and engine.player_health > 0:
-            print(f"\n{engine.check_health()}")
+            health_msg = engine.check_health()
+            print(f"\n{health_msg}")
+            if voice_enabled:
+                voice.speak(health_msg)
+
+
+def get_voice_type(text):
+    """Determine voice type from text"""
+    text_lower = text.lower()
+    
+    if 'troll' in text_lower and any(word in text_lower for word in ['says', 'roars', 'attacks']):
+        return 'troll'
+    elif 'goblin' in text_lower and any(word in text_lower for word in ['says', 'attacks']):
+        return 'goblin'
+    elif 'dragon' in text_lower and any(word in text_lower for word in ['says', 'roars', 'attacks']):
+        return 'dragon'
+    elif 'merchant' in text_lower and 'says' in text_lower:
+        return 'merchant'
+    else:
+        return 'narrator'
 
 
 if __name__ == "__main__":
