@@ -1,0 +1,87 @@
+N2NHU Engine: The 2-Hour Multiplayer Prototype
+"Taking the air out of commercial game engines."
+
+Current Status: Pre-Alpha / Proof of Concept Time to Build: ~2 Hours License: GPLv3
+
+🚀 The Mission
+Commercial game engines have become bloated behemoths. They require massive downloads, steep learning curves, and heavy client-side hardware.
+
+N2NHU (Neuron-to-Neural Human Universal) is the antidote.
+
+This repo represents literally the first two hours of work toward a vision of a Universal Game Engine. It proves that with the right architecture, you can deploy a persistent, multiplayer, PvP-enabled world in less time than it takes to install Unity.
+
+⚡ Key Features (implemented in 120 mins)
+Instant Multiplayer via SSH: No client download required. Players connect using standard terminal tools (ssh -p 2222 player@host).
+
+100% Config-Driven World:
+
+Rooms: Defined in rooms.ini (e.g., "Walk-In Freezer" with cold=true property).
+
+Objects: Defined in objects.ini (Properties include takeable, weapon, damage).
+
+Combat: Rules for PvP, PvE, and Bosses defined in combat.ini.
+
+Emergent Gameplay (State Transformations):
+
+The engine supports logic-based state changes defined in transformations.ini.
+
+Example: Placing a cup of water in a room tagged cold turns it into ice after 3 turns.
+
+Active AI Sprites:
+
+NPCs aren't static. sprites.ini defines behaviors like aggressive_looter (Troll) or item_thief (Goblin).
+
+Deep Combat System:
+
+Supports damage types, weapon multipliers, friendly fire toggles, and "death drop" mechanics where slain players lose their inventory.
+
+🛠️ Architecture
+The engine separates Logic (Python) from Content (INI). This democratizes creation—writers can build worlds without touching code.
+
+The "Brain" (ssh_server_multiplayer_rpg.py)
+A lightweight, async Python server using asyncssh. It handles:
+
+Player sessions and state.
+
+Real-time broadcasting (chat, movement, combat logs).
+
+Global turn processing for AI and transformations.
+
+The "World" (INI Configuration)
+combat.ini: Defines the "Physics" of violence. (e.g., player_vs_boss gets a 1.2x weapon multiplier).
+
+sprites.ini: Defines the "Life." (e.g., A Dragon with 200HP and breath_weapon=true).
+
+verbs.ini: Defines "Interaction." Aliases like attack, kill, hit map to the same logic.
+
+🎮 Quick Start
+Prerequisites: Python 3.7+, asyncssh
+
+Clone the repo:
+
+Bash
+git clone https://github.com/jimpames/N2NHU-labs-universal-game-engine.git
+cd N2NHU-labs-universal-game-engine
+Run the Server:
+
+Bash
+python3 ssh_server_multiplayer_rpg.py --port 2222
+**
+
+Play (Client-side): Open a terminal and run:
+
+Bash
+ssh -p 2222 playername@localhost
+(No password required)
+
+🔮 Roadmap: The Applied AI Future
+This prototype is the seed for the N2NHU Lab vision. Future iterations will replace static INI definitions with:
+
+Generative World Building: AI that writes rooms.ini and objects.ini on the fly based on player intent.
+
+Neural NPCs: Replacing simple aggressive_looter tags with LLM-driven agents that negotiate, lie, or form alliances.
+
+Visual Output: Bridging this text-based core into 3D rendering engines (Unity/Unreal) where N2NHU serves as the "Universal Brain."
+
+📜 License
+GPLv3 - Open Source and Free. Fork it, mod it, break it.WHY
