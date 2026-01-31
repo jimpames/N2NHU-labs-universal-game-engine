@@ -13,6 +13,7 @@ a product of the n2nhu lab for applied ai
 
 features:
 
+-speech out of descriptions / gameplay
 - multi user
 - SSH multi player
 - player vs player
@@ -27,10 +28,11 @@ make a config dir
 put all the .ini in folder config
 
 
-server:    python ssh_server_multiplayer_rpg.py
+server:                python ssh_server_multiplayer_rpg.py
 
-clients:   ssh -p 2222 player@localhost (or ip of zorksshserver)
+clients:               ssh -p 2222 player@localhost (or ip of zorksshserver)
 
+speech enabled client: python ssh_voice_simple.py
 
 
 
