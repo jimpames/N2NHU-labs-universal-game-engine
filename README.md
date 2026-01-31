@@ -24,17 +24,43 @@ features:
 - magic potions
 - physics for ice and water
 
-to run:
+to run system:
+
+you will need two venv for python:
+-------------------------------------
+Create venv for voice
+mkdir voice
+cd voice
+python -m venv venv_voice
+venv_voice\scripts\activate
+
+put the ssh_voice_simple.py in the voice folder
+
+--------------------------------------------------
+Create venv for server
+mkdir server
+cd server
+python -m venv venv_server
+venv_server\scripts\activate
+
+put the ssh_server_multiplayer_rpg.py in the server folder with ALL the files from the repo
 
 make a config dir
 put all the .ini in folder config
 
+- be SURE to make a config folder and put all the .ini in config folder...inside the server folder
 
-server:                python ssh_server_multiplayer_rpg.py
+--------------------------------------------------------------------------
 
-clients:               ssh -p 2222 player@localhost (or ip of zorksshserver)
+  
 
-speech enabled client: python ssh_voice_simple.py
+
+
+start server:                python ssh_server_multiplayer_rpg.py - be sure to make a new venv and run this cmd in there first time: pip install -r requirements.txt
+
+start SSH clients:               ssh -p 2222 player@localhost (or ip of zorksshserver)
+
+start speech enabled client: python ssh_voice_simple.py  - be sure to make a new venv and run this cmd in there first time: pip install -r voice-client-requirements.txt
 
 
 
