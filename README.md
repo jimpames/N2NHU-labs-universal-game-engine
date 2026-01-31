@@ -3,19 +3,20 @@
 
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
-version 4
+version 5
 
 GPL3
 
 a product of the n2nhu lab for applied ai
 
-video demo: https://youtu.be/dNnbPUjuWbE?si=1wuE087lL48rxjbR
+video demo: https://youtu.be/ImDskO5664g?si=w7o0u9tJvVKwifTi
 
-30 jan 2026
+31 jan 2026
 
 features:
 
 -speech out of descriptions / gameplay
+- player to player CHAT with TELL command
 - multi user
 - SSH multi player
 - player vs player
