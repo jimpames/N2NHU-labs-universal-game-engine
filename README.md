@@ -3,7 +3,7 @@
 
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
-version 3
+version 4
 
 GPL3
 
