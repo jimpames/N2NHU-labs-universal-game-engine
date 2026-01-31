@@ -9,6 +9,8 @@ GPL3
 
 a product of the n2nhu lab for applied ai
 
+video demo: https://youtu.be/dNnbPUjuWbE?si=1wuE087lL48rxjbR
+
 30 jan 2026
 
 features:
