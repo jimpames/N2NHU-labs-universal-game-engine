@@ -5,7 +5,9 @@ This is a demonstration of how **algebraic design with matrices** can create com
 
 version 5
 
-GPL3
+BOOK:  390 page theory of operation and design book now live in github - PDF - enjoy - GPL3 book  31 jan 2026
+
+GPL3 code
 
 a product of the n2nhu lab for applied ai
 
