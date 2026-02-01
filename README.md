@@ -7,7 +7,7 @@ version 5
 
 BOOK:  390 page theory of operation and design book now live in github - PDF - enjoy - GPL3 book  31 jan 2026
 
-Kindle Edition theory of operation:   https://www.amazon.com/dp/B0GKX969Y2#detailBullets_feature_div
+Kindle Edition theory of operation:   https://www.amazon.com/dp/B0GKX969Y2
 
 GPL3 code
 
