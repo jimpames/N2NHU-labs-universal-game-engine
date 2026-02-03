@@ -17,6 +17,9 @@ video demo: https://youtu.be/ImDskO5664g?si=w7o0u9tJvVKwifTi
 
 scaling / security enhancement coming soon in v6 by summer: https://github.com/jimpames/N2NHU-labs-universal-game-engine/blob/main/Planned%20Enhancements_%20Algebraic%20World%20Engine%20Architecture.pdf
 
+howto build business apps on our game engine:
+https://www.linkedin.com/pulse/free-book-gpl3-open-source-building-self-service-helpdesk-jim-ames-ertle/
+
 31 jan 2026
 
 features:
