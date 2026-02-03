@@ -15,7 +15,7 @@ a product of the n2nhu lab for applied ai
 
 video demo: https://youtu.be/ImDskO5664g?si=w7o0u9tJvVKwifTi
 
-coming soon in v6 by summer: https://github.com/jimpames/N2NHU-labs-universal-game-engine/blob/main/Planned%20Enhancements_%20Algebraic%20World%20Engine%20Architecture.pdf
+scaling / security enhancement coming soon in v6 by summer: https://github.com/jimpames/N2NHU-labs-universal-game-engine/blob/main/Planned%20Enhancements_%20Algebraic%20World%20Engine%20Architecture.pdf
 
 31 jan 2026
 
