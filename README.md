@@ -3,7 +3,35 @@
 
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
-version 5
+version 6
+
+version 6 is new as of 4 feb 
+- delivers graphics client and stable diffusion as render engine
+
+- ======================================================================
+
+to play graphics version:
+=====================================================================
+put stablediffusion.ini in the config dir
+
+mark your SD IP true in the INI and all the others FLASE
+=====================================================================
+bring up automatic1111 in API and LISTEN mode
+=====================================================================
+build your venv for the server
+cd zorkserver
+venv\scripts\activate
+pip install -r image-server-requirements.txt
+
+load the graphics  server : python speech_ssh_server_enhanced_SD
+=======================================================================================
+build your venv for the client
+cd zorkclient
+venv\scripts\activate
+pip install -r image-client-requirements.txt
+
+load the graphics client : python voice_image_ssh_client.py
+=============================================================================
 
 BOOK:  390 page theory of operation and design book now live in github - PDF - enjoy - GPL3 book  31 jan 2026
 
