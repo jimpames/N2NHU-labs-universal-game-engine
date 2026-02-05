@@ -23,7 +23,7 @@ cd zorkserver
 venv\scripts\activate
 pip install -r image-server-requirements.txt
 
-load the graphics  server : python speech_ssh_server_enhanced_SD
+load the graphics  server : python speech_ssh_server_enhanced_SD.py
 =======================================================================================
 build your venv for the client
 cd zorkclient
