@@ -10,7 +10,7 @@ version 6 is new as of 4 feb
 
 - ======================================================================
 
-to play graphics version:
+to play graphics version:  demo: https://youtu.be/H9VQkj39AJU?si=pLQKebWuOQnrheS2
 =====================================================================
 put stablediffusion.ini in the config dir
 
