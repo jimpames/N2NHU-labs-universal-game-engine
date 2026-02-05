@@ -3,7 +3,12 @@
 
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
-version 6
+version 7
+- v7 has character avatars when you inventory so you can see what they are carrying
+
+- start the  avatar version with the avatar server: speech_ssh_server_with_portraits.py
+
+- use the graphics client below
 
 version 6 is new as of 4 feb 
 - delivers graphics client and stable diffusion as render engine
