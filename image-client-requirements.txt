@@ -1,0 +1,14 @@
+asyncssh==2.22.0
+bcrypt==5.0.0
+cffi==2.0.0
+comtypes==1.4.15
+cryptography==46.0.4
+invoke==2.2.1
+paramiko==4.0.0
+pillow==12.1.0
+pycparser==3.0
+PyNaCl==1.6.2
+pypiwin32==223
+pyttsx3==2.99
+pywin32==311
+typing_extensions==4.15.0
