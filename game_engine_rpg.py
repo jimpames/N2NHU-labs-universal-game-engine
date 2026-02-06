@@ -115,6 +115,15 @@ class GameEngineRPG:
         self.deaths: int = 0
         self.potions_consumed: int = 0
         
+        # Taunt system
+        self.taunts = {
+            'addressees': [],
+            'insults': [],
+            'threats': [],
+            'special': {},
+            'settings': {}
+        }
+        
         self.load_all_configs()
         
         # Setup multiplayer if enabled
@@ -147,6 +156,7 @@ class GameEngineRPG:
         self.load_objects()
         self.load_sprites()
         self.load_transformations()
+        self.load_taunts()  # Load NPC taunt system
     
     def load_sprites(self):
         """Load sprite templates"""
@@ -291,6 +301,72 @@ class GameEngineRPG:
             
             self.transformations.append(transformation)
     
+    def load_taunts(self):
+        """Load NPC taunt matrix from taunts.ini"""
+        config = configparser.ConfigParser()
+        taunt_file = f"{self.config_path}/taunts.ini"
+        
+        if not Path(taunt_file).exists():
+            return  # Taunts are optional
+        
+        try:
+            config.read(taunt_file)
+            
+            # Load generic taunt components
+            if 'addressees' in config:
+                self.taunts['addressees'] = [x.strip() for x in config['addressees'].get('options', '').split(',') if x.strip()]
+            if 'insults' in config:
+                self.taunts['insults'] = [x.strip() for x in config['insults'].get('options', '').split(',') if x.strip()]
+            if 'threats' in config:
+                self.taunts['threats'] = [x.strip() for x in config['threats'].get('options', '').split(',') if x.strip()]
+            
+            # Load character-specific taunts
+            for section in config.sections():
+                if section.endswith('_taunts'):
+                    char_type = section.replace('_taunts', '')
+                    self.taunts['special'][char_type] = [x.strip() for x in config[section].get('special', '').split(',') if x.strip()]
+            
+            # Load settings
+            if 'taunt_settings' in config:
+                self.taunts['settings'] = {
+                    'taunt_chance': float(config['taunt_settings'].get('taunt_chance', '0.4')),
+                    'special_taunt_chance': float(config['taunt_settings'].get('special_taunt_chance', '0.6')),
+                    'fear_words': [x.strip() for x in config['taunt_settings'].get('fear_words', '').split(',') if x.strip()]
+                }
+        except Exception as e:
+            print(f"Warning: Could not load taunts: {e}")
+    
+    def generate_taunt(self, sprite: Sprite) -> str:
+        """Generate a random taunt for an NPC"""
+        if not self.taunts.get('addressees'):
+            return ""  # No taunt system loaded
+        
+        # Check if we should taunt at all
+        taunt_chance = self.taunts['settings'].get('taunt_chance', 0.4)
+        if random.random() > taunt_chance:
+            return ""
+        
+        # Try character-specific taunt first
+        sprite_type = sprite.get_property('ai_behavior', 'hostile')
+        special_chance = self.taunts['settings'].get('special_taunt_chance', 0.6)
+        
+        if sprite_type in self.taunts['special'] and random.random() < special_chance:
+            taunt_text = random.choice(self.taunts['special'][sprite_type])
+            return f'[TAUNT] The {sprite.name} snarls: "{taunt_text}"'
+        
+        # Generate generic taunt from matrix
+        addressee = random.choice(self.taunts['addressees'])
+        insult = random.choice(self.taunts['insults'])
+        threat = random.choice(self.taunts['threats'])
+        
+        # Optional fear word (30% chance)
+        fear = ""
+        fear_words = self.taunts['settings'].get('fear_words', [])
+        if fear_words and random.random() < 0.3:
+            fear = f" {random.choice(fear_words)}"
+        
+        return f'[TAUNT] The {sprite.name} snarls: "{addressee.capitalize()}, you are {insult}! {threat}!"{fear}'
+    
     def start_game(self):
         """Initialize game state"""
         # Find starting room
@@ -354,7 +430,7 @@ class GameEngineRPG:
                     room = random.choice(rooms)
                     sprite_id = self.spawn_sprite(template_name, room)
                     if sprite_id:
-                        messages.append(f"🔮 A {template['name']} has appeared somewhere in the dungeon...")
+                        messages.append(f"ðŸ”® A {template['name']} has appeared somewhere in the dungeon...")
         
         # Check potion spawns
         for obj_id, obj in self.objects.items():
@@ -363,7 +439,7 @@ class GameEngineRPG:
                 if spawn_chance > 0 and random.random() < spawn_chance:
                     rooms = list(self.rooms.keys())
                     obj.location = random.choice(rooms)
-                    messages.append(f"✨ A {obj.name} has materialized!")
+                    messages.append(f"âœ¨ A {obj.name} has materialized!")
         
         return messages
     
@@ -381,10 +457,20 @@ class GameEngineRPG:
                 if sprite.is_hostile() and random.random() < sprite.aggression:
                     damage = sprite.damage
                     self.player_health -= damage
-                    messages.append(f"⚔️  The {sprite.name} attacks you for {damage} damage!")
+                    
+                    # BATTLE_START marker for server to generate scene!
+                    messages.append(f"BATTLE_START:{sprite.name}")
+                    
+                    # Generate taunt
+                    taunt = self.generate_taunt(sprite)
+                    if taunt:
+                        messages.append(taunt)
+                    
+                    messages.append(f"[ATK] The {sprite.name} attacks you for {damage} damage!")
                     
                     if self.player_health <= 0:
-                        messages.append("💀 You have been slain!")
+                        messages.append("[DEAD] You have been slain!")
+                        self.deaths += 1
                         self.deaths += 1
                 
                 # Sprite might pick up items
@@ -395,7 +481,7 @@ class GameEngineRPG:
                         item = random.choice(items_here)
                         item.location = sprite_id  # Sprite takes it
                         sprite.inventory.add(item.id)
-                        messages.append(f"👹 The {sprite.name} picks up the {item.name}!")
+                        messages.append(f"ðŸ‘¹ The {sprite.name} picks up the {item.name}!")
             else:
                 # Random movement
                 if random.random() < 0.2:
@@ -416,10 +502,10 @@ class GameEngineRPG:
         if self.turn_count % 5 == 0:  # Every 5 turns
             self.player_health -= 2
             if self.player_health < 30:
-                messages.append("⚠️  You're feeling weak from exhaustion...")
+                messages.append("âš ï¸  You're feeling weak from exhaustion...")
         
         if self.player_health <= 0:
-            messages.append("💀 You have died from exhaustion! GAME OVER")
+            messages.append("ðŸ’€ You have died from exhaustion! GAME OVER")
             self.deaths += 1
             return messages
         
@@ -458,6 +544,13 @@ class GameEngineRPG:
         
         obj = self.objects[obj_id]
         
+        # Skip template objects (location='none')  
+        if obj.location == 'none':
+            return None
+        
+        # DEBUG: Log transformation check
+        trans_id = transformation.get('id', 'unknown')
+        
         # Check state
         required_state = conditions.get('state')
         if required_state and obj.state != required_state:
@@ -466,14 +559,33 @@ class GameEngineRPG:
         # Check location property (or lack thereof for ice melting)
         location_prop = conditions.get('location_has_property')
         if location_prop:
-            if obj.location in self.rooms:
-                room = self.rooms[obj.location]
-                if not room.get_property(location_prop, False):
+            # Determine which room to check
+            room_to_check = None
+            
+            # If object is in inventory or player location, use player's current room
+            if obj.location == 'inventory' or obj.location == self.player_location or obj.id in self.inventory:
+                room_to_check = self.player_location
+            # Otherwise use the object's location
+            elif obj.location in self.rooms:
+                room_to_check = obj.location
+            
+            if room_to_check and room_to_check in self.rooms:
+                room = self.rooms[room_to_check]
+                has_prop = room.get_property(location_prop, False)
+                if not has_prop:
                     return None
+            else:
+                return None
         else:
             # No location property specified - check if NOT in cold room (for ice melting)
-            if obj.location in self.rooms:
-                room = self.rooms[obj.location]
+            room_to_check = None
+            if obj.location == 'inventory' or obj.location == self.player_location or obj.id in self.inventory:
+                room_to_check = self.player_location
+            elif obj.location in self.rooms:
+                room_to_check = obj.location
+                
+            if room_to_check and room_to_check in self.rooms:
+                room = self.rooms[room_to_check]
                 if room.get_property('cold', False):
                     return None  # Don't melt in cold room
         
@@ -481,6 +593,7 @@ class GameEngineRPG:
         turns_required = conditions.get('turns_required', 0)
         if obj.state_turn_count < turns_required:
             return None
+        
         
         # Apply transformation
         if transformation['new_state']:
@@ -681,15 +794,15 @@ class GameEngineRPG:
         sprites_here = [s for s in self.sprites.values() 
                        if s.location == self.player_location and s.is_alive()]
         if sprites_here:
-            output.append("\n🚨 ENEMIES:")
+            output.append("\nðŸš¨ ENEMIES:")
             for sprite in sprites_here:
-                health_bar = f"[{'█' * (sprite.health // 10)}{'░' * ((sprite.max_health - sprite.health) // 10)}]"
+                health_bar = f"[{'â–ˆ' * (sprite.health // 10)}{'â–‘' * ((sprite.max_health - sprite.health) // 10)}]"
                 items_held = ""
                 if sprite.inventory:
                     item_names = [self.objects[id].name for id in sprite.inventory if id in self.objects]
                     if item_names:
                         items_held = f" (holding: {', '.join(item_names)})"
-                output.append(f"  ⚔️  {sprite.name} {health_bar} {sprite.health}/{sprite.max_health} HP{items_held}")
+                output.append(f"  âš”ï¸  {sprite.name} {health_bar} {sprite.health}/{sprite.max_health} HP{items_held}")
         
         # List objects in room
         objects_here = [obj for obj in self.objects.values() 
@@ -698,7 +811,7 @@ class GameEngineRPG:
             output.append("\nYou can see:")
             for obj in objects_here:
                 state_desc = f" ({obj.state})" if obj.state != "normal" else ""
-                weapon_mark = " ⚔️ " if obj.is_weapon() else "  "
+                weapon_mark = " âš”ï¸ " if obj.is_weapon() else "  "
                 output.append(f"{weapon_mark}- {obj.name}{state_desc}")
         
         return "\n".join(output)
@@ -745,8 +858,8 @@ class GameEngineRPG:
         for obj_id in self.inventory:
             if obj_id in self.objects:
                 obj = self.objects[obj_id]
-                weapon_mark = "⚔️ " if obj.is_weapon() else ""
-                potion_mark = "💊 " if obj.get_property('consumable') else ""
+                weapon_mark = "âš”ï¸ " if obj.is_weapon() else ""
+                potion_mark = "ðŸ’Š " if obj.get_property('consumable') else ""
                 output.append(f"  {weapon_mark}{potion_mark}{obj.name}")
         return "\n".join(output)
     
@@ -818,7 +931,7 @@ class GameEngineRPG:
         self.inventory.remove(obj.id)
         obj.location = 'none'  # Consumed
         
-        return f"💊 You drink the {obj.name} and restore {heal_amount} HP! (Health: {self.player_health}/{self.player_max_health})"
+        return f"ðŸ’Š You drink the {obj.name} and restore {heal_amount} HP! (Health: {self.player_health}/{self.player_max_health})"
     
     def attack(self, target: Sprite, weapon_name: Optional[str] = None) -> str:
         """Attack a sprite"""
@@ -861,12 +974,12 @@ class GameEngineRPG:
             
             loot_msg = ""
             if loot:
-                loot_msg = f"\n💰 The {target.name} dropped: {', '.join(loot)}"
+                loot_msg = f"\nðŸ’° The {target.name} dropped: {', '.join(loot)}"
             
             del self.sprites[target.id]
-            return f"⚔️  You attack the {target.name} with {weapon.name if weapon else 'your fists'} for {base_damage} damage!\n💀 The {target.name} has been slain!{loot_msg}"
+            return f"âš”ï¸  You attack the {target.name} with {weapon.name if weapon else 'your fists'} for {base_damage} damage!\nðŸ’€ The {target.name} has been slain!{loot_msg}"
         else:
-            return f"⚔️  You attack the {target.name} with {weapon.name if weapon else 'your fists'} for {base_damage} damage! ({target.health}/{target.max_health} HP remaining)"
+            return f"âš”ï¸  You attack the {target.name} with {weapon.name if weapon else 'your fists'} for {base_damage} damage! ({target.health}/{target.max_health} HP remaining)"
     
     def flee(self) -> str:
         """Flee from current room"""
@@ -877,20 +990,20 @@ class GameEngineRPG:
         # Pick random exit
         direction = random.choice(list(room.exits.keys()))
         self.player_location = room.exits[direction]
-        return f"🏃 You flee {direction}!\n\n{self.look()}"
+        return f"ðŸƒ You flee {direction}!\n\n{self.look()}"
     
     def check_health(self) -> str:
         """Check player health"""
         health_pct = (self.player_health / self.player_max_health) * 100
-        health_bar = f"[{'█' * (self.player_health // 10)}{'░' * ((self.player_max_health - self.player_health) // 10)}]"
+        health_bar = f"[{'â–ˆ' * (self.player_health // 10)}{'â–‘' * ((self.player_max_health - self.player_health) // 10)}]"
         
         status = "Healthy"
         if health_pct < 30:
-            status = "Critical! ⚠️"
+            status = "Critical! âš ï¸"
         elif health_pct < 60:
             status = "Wounded"
         
-        return f"💚 Health: {health_bar} {self.player_health}/{self.player_max_health} HP ({health_pct:.0f}%) - {status}"
+        return f"ðŸ’š Health: {health_bar} {self.player_health}/{self.player_max_health} HP ({health_pct:.0f}%) - {status}"
     
     def save_player_state(self):
         """Save player state to multiplayer files"""
