@@ -7,6 +7,9 @@ version 10 production
 ================================================================================================================================
 with easy installers
 
+howto install video:
+https://youtu.be/bAtyRMCmDns?si=xRr4gwO4NHB4jj_f
+
 download easy installers:
 https://www.dropbox.com/scl/fo/upcb6fk3imb6khrazw42i/AD0uFqLPsdxplR01nq2YDn4?rlkey=6tczufm2jd698j3liufnt5cl9&e=2&st=fjtc6peb&dl=0
 
