@@ -41,8 +41,10 @@ client.ini ip address of game server is in this folder
   
 
 =================================================================================================================================
+
 all this down here is out of data and only useful to see how it was built
-- you should be using the easy installers edtailed above
+
+- you should be using the easy installers mentioned above
 
 - SOURCE CODE FOR V10 above are newest files in repo
  
