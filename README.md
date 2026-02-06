@@ -6,6 +6,24 @@ This is a demonstration of how **algebraic design with matrices** can create com
 radio show overview: 15 mins - https://youtu.be/sOs92yoW4VI?si=5dw5mY4izGk8gDZZ
 
 version 10 production
+
+graphics render engine dependency: install automatic1111 in API and LISTEN MODE and edit the config\stablediffusion.ini and give it the IP
+
+stable diffusion: you shoud install it if you want graphics
+https://github.com/AUTOMATIC1111/stable-diffusion-webui
+
+To start Automatic1111 in API and Listen mode, add the command-line arguments --api --listen to your startup script (webui-user.bat on Windows or webui.sh on Linux). This allows external access to the API on port 7860, enabling remote requests and Swagger documentation at <your-ip>:7860/docs. 
+Steps to Configure and Run:
+Windows: Edit webui-user.bat and set:
+set COMMANDLINE_ARGS=--api --listen
+Linux: Edit webui-user.sh or run directly:
+./webui.sh --api --listen
+Alternative: Run directly from the terminal: python launch.py --api --listen.
+Important Options: Add --xformers for better performance or specify a port with --port 8080 if 7860 is unavailable. 
+Usage:
+Once started, the API endpoints will be active, such as http://127.0.0.1:7860/sdapi/v1/txt2img for text-to-image generation. If running on a server, use the server's IP address (e.g., http://192.168.1.3:7860/docs) to access the documentation. 
+
+
 ================================================================================================================================
 with easy installers
 
