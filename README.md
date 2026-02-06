@@ -3,6 +3,8 @@
 
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
+radio show overview: 15 mins - https://youtu.be/sOs92yoW4VI?si=5dw5mY4izGk8gDZZ
+
 version 10 production
 ================================================================================================================================
 with easy installers
