@@ -27,6 +27,7 @@ all this down here is out of data and only useful to see how it was built
 - SOURCE CODE FOR V10 above are newest files in repo
 game_engine_rpg.py
 speech_ssh_server_BATTLE_VIZ.py
+voice_image_ssh_client_latest.py
 
   
 - v7 has character avatars when you inventory so you can see what they are carrying
