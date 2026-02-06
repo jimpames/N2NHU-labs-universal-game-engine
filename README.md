@@ -3,7 +3,22 @@
 
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
-version 7
+version 10 production
+================================================================================================================================
+with easy installers
+
+download easy installers:
+https://www.dropbox.com/scl/fo/upcb6fk3imb6khrazw42i/AD0uFqLPsdxplR01nq2YDn4?rlkey=6tczufm2jd698j3liufnt5cl9&e=2&st=fjtc6peb&dl=0
+
+the client.ini in this folder can be edited to control which server you attach to
+- default is localhost
+
+client.ini ip address of game server is in this folder
+  C:\Program Files (x86)\n2nhu-labs\n2nhu labs universal game engine for stable diffusion - client\config
+  
+
+=================================================================================================================================
+
 - v7 has character avatars when you inventory so you can see what they are carrying
 
 - start the  avatar version with the avatar server: speech_ssh_server_with_portraits.py
