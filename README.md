@@ -21,7 +21,12 @@ client.ini ip address of game server is in this folder
   
 
 =================================================================================================================================
+all this down here is out of data and only useful to see how it was built
+- you should be using the easy installers edtailed above
 
+- SOURCE CODE FOR V10 above are newest files in repo
+
+  
 - v7 has character avatars when you inventory so you can see what they are carrying
 
 - start the  avatar version with the avatar server: speech_ssh_server_with_portraits.py
