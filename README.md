@@ -1,6 +1,15 @@
 # ZORK-like Text Adventure Game
 ## Matrix-Based Algebraic Design Demo
 
+19 FEB 26
+
+now with AREA 51 game !!!!!!!!!!!!! use the ez-installer version binaries! get the AREA 51 INIs, put them in CONFIG and play!
+https://github.com/jimpames/AREA-51-config-ini-files-for-n2nhu-universal-game-engine
+
+glitches:
+I need to fix inventory and battle scenes to not be troll world for this version
+
+===================================================================================================================
 This is a demonstration of how **algebraic design with matrices** can create complex gameplay with minimal code.
 
 radio show overview: 15 mins - https://youtu.be/sOs92yoW4VI?si=5dw5mY4izGk8gDZZ
@@ -11,7 +20,7 @@ graphics render engine dependency: install automatic1111 in API and LISTEN MODE 
 
 stable diffusion: you shoud install it if you want graphics
 https://github.com/AUTOMATIC1111/stable-diffusion-webui
-
+=============================================================================================================================================
 To start Automatic1111 in API and Listen mode, add the command-line arguments --api --listen to your startup script (webui-user.bat on Windows or webui.sh on Linux). This allows external access to the API on port 7860, enabling remote requests and Swagger documentation at <your-ip>:7860/docs. 
 Steps to Configure and Run:
 Windows: Edit webui-user.bat and set:
