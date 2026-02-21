@@ -1,6 +1,12 @@
 # ZORK-like Text Adventure Game
 ## Matrix-Based Algebraic Design Demo
 
+21 FEB 2026
+
+DEV TEAM COMMS and SUPPORT and COMMUNITY
+
+https://www.facebook.com/share/g/1AxDKo3t3Q/
+
 19 FEB 26
 
 now with AREA 51 game !!!!!!!!!!!!! use the ez-installer version binaries! get the AREA 51 INIs, put them in CONFIG and play!
