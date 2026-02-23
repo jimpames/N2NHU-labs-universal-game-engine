@@ -1,6 +1,19 @@
 # ZORK-like Text Adventure Game
 ## Matrix-Based Algebraic Design Demo
 
+22 FEB 2026
+
+NEW! Infinite improbability drive - generate worlds automatically!
+https://github.com/jimpames/n2nhu-infinite-improbabilty-drive-for-universal-game-engine
+
+Overview
+
+Uses local GPT4ALL in API mode to auto-generate worlds - based on world name!
+
+This component is in beta
+
+=================================================================================================================
+
 21 FEB 2026
 
 DEV TEAM COMMS and SUPPORT and COMMUNITY
