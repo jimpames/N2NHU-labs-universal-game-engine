@@ -12,7 +12,7 @@ Uses local GPT4ALL in API mode to auto-generate worlds - based on world name!
 
 This component is in beta
 
-n2nhu-infinite-improbabilty-drive-for-universal-game-engine
+n2nhu-infinite-improbability-drive-for-universal-game-engine
 
 22 feb 2026
 
